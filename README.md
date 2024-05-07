@@ -46,7 +46,7 @@ Dockerfile
 Feito isso, podemos dar o build da nossa imagem:
 
 ```bash
-docker build -t api-empacotada .
+docker build -t api-empacotada:v1 .
 ```
 
 > Estamos usando o ".", pois temos o arquivo "Dockerfile" na raiz do nosso projeto, é lido como um "index" da pasta root do nosso projeto. (senão teria que ser passado o parâmetro `-f` para fazer referência ao arquivo com as instruções para buildar a imagem da aplicação)
