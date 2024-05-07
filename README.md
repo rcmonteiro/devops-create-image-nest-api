@@ -8,28 +8,30 @@ O que ela precisa?
 - buildar a aplicação (npm run build)
 - iniciar a aplicação (npm start)
 
-Podemos montar nosso Dockerfile, usando já uma imagem leve de node (node:20-slim), e rodar os comandos para copiar, instalar as dependências, e então rodar a aplicação na porta que foi exposta, e é utilizada pela API, e vamos usar o pnpm como package manager
+Podemos montar nosso Dockerfile e rodar os comandos para copiar, instalar as dependências, e então rodar a aplicação na porta que foi exposta, e é utilizada pela API, e vamos usar o pnpm como package manager
 
 ```dockerfile
-FROM node:20-slim AS base
+FROM node:18-alpine3.19 AS build
+
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable
-
 WORKDIR /usr/src/app
-
 COPY package.json pnpm-lock.yaml ./
-
 RUN pnpm i 
-
 COPY . .
-
 RUN pnpm run build
 
-EXPOSE 3000
+FROM node:18-alpine3.19
 
+WORKDIR /usr/src/app
+COPY --from=build /usr/src/app/dist ./dist
+COPY --from=build /usr/src/app/node_modules ./node_modules
+EXPOSE 3000
 CMD ["pnpm", "start"]
 ```
+
+Foi pensado em múltiplos estágios, e uso da imagem alpine para ficar com uma imagem pequena
 
 Antes de rodar, vamos criar o `.dockerignore` para deixar o processo de build mais ágil:
 
