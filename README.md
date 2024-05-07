@@ -39,10 +39,10 @@ docker build -t api-empacotada .
 Agora podemos rodar nossa aplicação a partir da imagem:
 
 ```bash
-docker run --rm -p 3001:3000 api-empacotada
+docker run --rm -p 3001:3000 -d api-empacotada
 ```
 
-> Usamos o `--rm` pois um container tem um ciclo de vida, então quando ele for parado ele é excluído.abs
+> Usamos o `--rm` pois um container tem um ciclo de vida, então quando ele for parado ele é excluído.abs, não passando este parâmetro, o container fica disponível na máquina para rodar novamente outra vez.
 > Também usamos a porta `3001` para ficar claro que estamos acessando a aplicação pelo docker, e não pelo ambiente local do host.
 
 E pronto, tudo certo!
