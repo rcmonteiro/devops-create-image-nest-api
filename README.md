@@ -78,3 +78,36 @@ X-Powered-By: Express
 
 Hello World!
 ```
+
+Com um banco de dados como dependência, para rodar local, fica bacana usar o docker-compose, ficando bem prático para subir o ambiente local usando a nossa imagem da aplicação que criamos pelo Dockerfile:
+
+```
+services:
+  mysql:
+    image: mysql:8
+    container_name: mysql
+    ports:
+      - 3306:3306
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=rocketseat-db
+      - MYSQL_USER=admin
+      - MYSQL_PASSWORD=root
+    networks:
+      - first-network
+  
+  sample-api:
+    build:
+      context: .
+    container_name: sample-api
+    ports:
+      - 3001:3000
+    depends_on:
+      - mysql
+    networks:
+      - first-network
+
+networks:
+  first-network:
+    driver: bridge
+```
