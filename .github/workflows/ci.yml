@@ -10,9 +10,6 @@ jobs:
     name: 'Build and Push'
     # Definir o runner para rodar as actions
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node: [ 16, 18, 20 ]
 
     steps:
       - name: Checkout
@@ -21,7 +18,7 @@ jobs:
       - name: Install Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node }}
+          node-version: 20
 
       - uses: pnpm/action-setup@v4
         name: Install pnpm
@@ -48,6 +45,12 @@ jobs:
       - name: Run tests
         run: pnpm run test
 
+      - name: Create tag
+        id: create_tag
+        run: |
+          SHA=$(echo $GITHUB_SHA | head -c7)
+          echo "sha=$SHA" >> $GITHUB_OUTPUT
+
       - name: Build docker image
-        run: docker build -t devops-sample-api-ci:latest .
+        run: docker build -t devops-sample-api-ci:${{ steps.generate_tag.outputs.sha }} .
 
