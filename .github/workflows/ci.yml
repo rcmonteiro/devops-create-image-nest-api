@@ -10,6 +10,9 @@ jobs:
     name: 'Build and Push'
     # Definir o runner para rodar as actions
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: [ 14, 16, 18 ]
 
     steps:
       - name: Checkout
@@ -18,7 +21,7 @@ jobs:
       - name: Install Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: ${{ matrix.node }}
 
       - uses: pnpm/action-setup@v4
         name: Install pnpm
