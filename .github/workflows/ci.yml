@@ -45,6 +45,12 @@ jobs:
       - name: Run tests
         run: pnpm run test
 
+      - name: Login on Container Registry
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
       - name: Create tag
         id: create_tag
         run: |
@@ -52,5 +58,7 @@ jobs:
           echo "sha=$SHA" >> $GITHUB_OUTPUT
 
       - name: Build docker image
-        run: docker build -t devops-sample-api-ci:${{ steps.create_tag.outputs.sha }} .
+        run: docker build -t rcmonteiro/devops-sample-api-ci:${{ steps.create_tag.outputs.sha }} .
 
+      - name: Push image to container registry
+        run: docker push rcmonteiro/devops-sample-api-ci:${{ steps.create_tag.outputs.sha }}
