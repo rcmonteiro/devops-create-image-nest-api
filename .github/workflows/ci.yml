@@ -8,7 +8,18 @@ on:
 jobs:
   build:
     name: 'Build and Push'
+    # Definir o runner para rodar as actions
     runs-on: ubuntu-latest
 
     steps:
+    # Permitir o acesso ao código da aplicação
     - uses: actions/checkout@v4
+
+    # Fazer o setup do node para rodar a aplicação
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 20
+        cache: 'yarn'
+    - run: yarn
+    - run: yarn run test
+
