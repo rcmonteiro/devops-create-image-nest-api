@@ -48,3 +48,6 @@ jobs:
       - name: Run tests
         run: pnpm run test
 
+      - name: Build docker image
+        run: docker build -t devops-sample-api-ci:latest .
+
