@@ -51,6 +51,11 @@ jobs:
       - name: Run tests
         run: pnpm run test
 
+      - name: Semantic Release
+        uses: cycjimmy/semantic-release-action@v4
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+
       - name: Create tag
         id: create_tag
         run: |
