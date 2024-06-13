@@ -71,12 +71,29 @@ jobs:
         uses: aws-actions/amazon-ecr-login@v2
 
       - name: Build and Push Docker image
+        id: build-docker-image
         env: 
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           TAG: ${{ steps.create_tag.outputs.sha }}
         run: | 
           docker build -t $ECR_REGISTRY/rcmonteiro_devops_nest_ci:$TAG .
           docker push $ECR_REGISTRY/rcmonteiro_devops_nest_ci:$TAG
+          IMAGE=$(echo $ECR_REGISTRY/rcmonteiro_devops_nest_ci:$TAG)
+          echo "image=$IMAGE" >> $GITHUB_OUTPUT
+
+      - name: Deploy to AWS App Runner
+        uses: awslabs/amazon-app-runner-deploy@main
+        env: 
+          IMAGE: ${{ steps.build-docker-image.outputs.image }}
+        with: 
+          service: rcmonteiro_devops_nest_api
+          image: $IMAGE
+          access-role-arn: arn:aws:iam::381492262362:role/app_runner_role
+          region: us-east-2
+          cpu: 1
+          memory: 1
+          port: 3000
+
 
       # ------------------------------------------------------------
       # Exemplo de publicação no Docker Hub

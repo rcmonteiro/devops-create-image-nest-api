@@ -43,22 +43,36 @@ resource "aws_iam_role" "ecr_role" {
   inline_policy {
     name = "ecr-app-permission"
 
+    # Step 5: Insert the Statement for the apprunner and IAM
     policy = jsonencode({
       "Version": "2012-10-17",
       "Statement": [
         {
-            "Effect": "Allow",
-            "Action": [
-                "ecr:GetDownloadUrlForLayer",
-                "ecr:BatchGetImage",
-                "ecr:BatchCheckLayerAvailability",
-                "ecr:PutImage",
-                "ecr:InitiateLayerUpload",
-                "ecr:UploadLayerPart",
-                "ecr:CompleteLayerUpload",
-                "ecr:GetAuthorizationToken"
-            ],
-            "Resource": "*"
+         "Action": "apprunner:*" 
+         "Effect": "Allow",
+         "Resource": "*"
+        },
+        {
+         "Action": [
+            "iam:PassRole",
+            "iam:CreateServiceLinkedRole"
+         ],
+         "Effect": "Allow",
+         "Resource": "*"
+        },
+        {
+          "Effect": "Allow",
+          "Action": [
+              "ecr:GetDownloadUrlForLayer",
+              "ecr:BatchGetImage",
+              "ecr:BatchCheckLayerAvailability",
+              "ecr:PutImage",
+              "ecr:InitiateLayerUpload",
+              "ecr:UploadLayerPart",
+              "ecr:CompleteLayerUpload",
+              "ecr:GetAuthorizationToken"
+          ],
+          "Resource": "*"
         }
       ]
     })
@@ -69,5 +83,30 @@ resource "aws_iam_role" "ecr_role" {
   }
 }
 
+# Step 4: Create an IAM role for the App Runner
+resource "aws_iam_role" "app_runner_role" {
+  name = "app_runner_role"
 
+  assume_role_policy = jsonencode({
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Effect": "Allow",
+        "Principal": {
+          "Service": "build.apprunner.amazonaws.com"
+        },
+        "Action": "sts:AssumeRole"
+      }
+    ]
+  })
 
+  managed_policy_arns = [
+    "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
+  ]
+
+  tags = {
+    IaC = "True"
+  }
+}
+
+  
