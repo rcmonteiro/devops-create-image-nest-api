@@ -63,7 +63,7 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: arn:aws:iam::381492262362:role/ecr_role
+          role-to-assume: ${{ secrets.ECR_ARN }}
           aws-region: us-east-2
 
       - name: Login to AWS ECR
@@ -83,12 +83,10 @@ jobs:
 
       - name: Deploy to AWS App Runner
         uses: awslabs/amazon-app-runner-deploy@main
-        env: 
-          IMAGE: ${{ steps.build-docker-image.outputs.image }}
         with: 
           service: rcmonteiro_devops_nest_api
-          image: $IMAGE
-          access-role-arn: arn:aws:iam::381492262362:role/app_runner_role
+          image: ${{ steps.build-docker-image.outputs.image }}
+          access-role-arn: ${{ secrets.APP_RUNNER_ARN }}
           region: us-east-2
           cpu: 1
           memory: 1
