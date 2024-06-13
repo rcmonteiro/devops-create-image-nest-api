@@ -6,7 +6,9 @@ on:
       - main
 
 permissions:
+  # Grants the workflow permission to create OpenID Connect (OIDC) ID tokens.
   id-token: write
+  # Grants the workflow read-only access to the repository contents.
   contents: read
 
 jobs:
@@ -55,6 +57,9 @@ jobs:
           SHA=$(echo $GITHUB_SHA | head -c7)
           echo "sha=$SHA" >> $GITHUB_OUTPUT
 
+      # ------------------------------------------------------------
+      # Exemplo de publicação no ECR
+      # ------------------------------------------------------------
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -65,21 +70,28 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
+      - name: Build and Push Docker image
+        env: 
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          TAG: ${{ steps.create_tag.outputs.sha }}
+        run: | 
+          docker build -t $ECR_REGISTRY/rcmonteiro_devops_nest_ci:$TAG .
+          docker push $ECR_REGISTRY/rcmonteiro_devops_nest_ci:$TAG
+
+      # ------------------------------------------------------------
       # Exemplo de publicação no Docker Hub
+      # ------------------------------------------------------------
       # - name: Login on Container Registry
       #   uses: docker/login-action@v3
       #   with:
       #     username: ${{ secrets.DOCKERHUB_USERNAME }}
       #     password: ${{ secrets.DOCKERHUB_TOKEN }}
-
       # - name: Build and Push to Docker
       #   uses: docker/build-push-action@v5
       #   with:
       #     push: true
       #     tags: rcmonteiro/devops-sample-api-ci:${{ steps.create_tag.outputs.sha }},rcmonteiro/devops-sample-api-ci:latest
-
-#      - name: Build docker image
-#        run: docker build -t rcmonteiro/devops-sample-api-ci:${{ steps.create_tag.outputs.sha }} .
-#
-#      - name: Push image to container registry
-#        run: docker push rcmonteiro/devops-sample-api-ci:${{ steps.create_tag.outputs.sha }}
+      # - name: Build docker image
+      #   run: docker build -t rcmonteiro/devops-sample-api-ci:${{ steps.create_tag.outputs.sha }} .
+      # - name: Push image to Docker Hub
+      #   run: docker push rcmonteiro/devops-sample-api-ci:${{ steps.create_tag.outputs.sha }}
