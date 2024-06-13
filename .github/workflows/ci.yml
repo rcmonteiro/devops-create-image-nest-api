@@ -78,10 +78,13 @@ jobs:
         run: | 
           docker build -t $ECR_REGISTRY/rcmonteiro_devops_nest_ci:$TAG .
           docker push $ECR_REGISTRY/rcmonteiro_devops_nest_ci:$TAG
+          docker tag -t $ECR_REGISTRY/rcmonteiro_devops_nest_ci:latest
+          docker push $ECR_REGISTRY/rcmonteiro_devops_nest_ci:latest
           IMAGE=$(echo $ECR_REGISTRY/rcmonteiro_devops_nest_ci:$TAG)
           echo "image=$IMAGE" >> $GITHUB_OUTPUT
 
       - name: Deploy to AWS App Runner
+        id: deploy-app-runner
         uses: awslabs/amazon-app-runner-deploy@main
         with: 
           service: rcmonteiro_devops_nest_api
@@ -91,6 +94,11 @@ jobs:
           cpu: 1
           memory: 2
           port: 3000
+          wait-for-service-stability-seconds: 180
+
+      - name: App Runner Check Status
+        run: | 
+          echo "App Runner Status: ${{ steps.deploy-app-runner.outputs.service-url }}"
 
 
       # ------------------------------------------------------------
