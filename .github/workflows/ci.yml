@@ -6,9 +6,7 @@ on:
       - main
 
 permissions:
-  # Grants the workflow permission to create OpenID Connect (OIDC) ID tokens.
   id-token: write
-  # Grants the workflow write access to the repository contents. (needed for the semantic release)
   contents: write
   issues: write
   pull-requests: write
