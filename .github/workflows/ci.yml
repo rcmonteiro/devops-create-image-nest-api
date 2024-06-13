@@ -8,8 +8,8 @@ on:
 permissions:
   # Grants the workflow permission to create OpenID Connect (OIDC) ID tokens.
   id-token: write
-  # Grants the workflow read-only access to the repository contents.
-  contents: read
+  # Grants the workflow write access to the repository contents. (needed for the semantic release)
+  contents: write
 
 jobs:
   build:
