@@ -3,6 +3,8 @@
 /node_modules
 /build
 
+**/.terraform/
+
 # Logs
 logs
 *.log

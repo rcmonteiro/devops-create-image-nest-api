@@ -45,20 +45,37 @@ jobs:
       - name: Run tests
         run: pnpm run test
 
-      - name: Login on Container Registry
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-
       - name: Create tag
         id: create_tag
         run: |
           SHA=$(echo $GITHUB_SHA | head -c7)
           echo "sha=$SHA" >> $GITHUB_OUTPUT
 
-      - name: Build docker image
-        run: docker build -t rcmonteiro/devops-sample-api-ci:${{ steps.create_tag.outputs.sha }} .
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::381492262362:role/ecr_role
+          aws-region: us-east-2
 
-      - name: Push image to container registry
-        run: docker push rcmonteiro/devops-sample-api-ci:${{ steps.create_tag.outputs.sha }}
+      - name: Login to AWS ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      # Exemplo de publicação no Docker Hub
+      # - name: Login on Container Registry
+      #   uses: docker/login-action@v3
+      #   with:
+      #     username: ${{ secrets.DOCKERHUB_USERNAME }}
+      #     password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      # - name: Build and Push to Docker
+      #   uses: docker/build-push-action@v5
+      #   with:
+      #     push: true
+      #     tags: rcmonteiro/devops-sample-api-ci:${{ steps.create_tag.outputs.sha }},rcmonteiro/devops-sample-api-ci:latest
+
+#      - name: Build docker image
+#        run: docker build -t rcmonteiro/devops-sample-api-ci:${{ steps.create_tag.outputs.sha }} .
+#
+#      - name: Push image to container registry
+#        run: docker push rcmonteiro/devops-sample-api-ci:${{ steps.create_tag.outputs.sha }}
