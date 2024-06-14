@@ -82,9 +82,8 @@ jobs:
           TAG: ${{ steps.create_tag.outputs.sha }}
         run: | 
           docker build -t $ECR_REGISTRY/rcmonteiro_devops_nest_ci:$TAG .
-          docker push $ECR_REGISTRY/rcmonteiro_devops_nest_ci:$TAG
           docker tag $ECR_REGISTRY/rcmonteiro_devops_nest_ci:$TAG $ECR_REGISTRY/rcmonteiro_devops_nest_ci:latest
-          docker push $ECR_REGISTRY/rcmonteiro_devops_nest_ci:latest
+          docker push --all-tags $ECR_REGISTRY/rcmonteiro_devops_nest_ci
           IMAGE=$(echo $ECR_REGISTRY/rcmonteiro_devops_nest_ci:$TAG)
           echo "image=$IMAGE" >> $GITHUB_OUTPUT
 
